@@ -52,10 +52,26 @@ def get_user_input():
     threshold = ask_float("Alert threshold: ")
     return sensor_type, count, minimum, maximum, threshold
 
+SEED = 42   # fixed seed: the same "random" readings every run (reproducible)
+
+def generate_readings(count, minimum, maximum, seed=SEED):
+    #"""Return a NumPy array of count random readings between minimum and maximum."""
+    if count <= 0:
+        raise ValueError("count must be greater than 0")
+    if minimum >= maximum:
+        raise ValueError("minimum must be smaller than maximum")
+
+    random.seed(seed)
+    readings = [round(random.uniform(minimum, maximum), 2) for _ in range(count)]
+    return np.array(readings)
+
 def main():
     print("Sensor Data Analysis Tool")
     sensor_type, count, minimum, maximum, threshold = get_user_input()
-    print(sensor_type, count, minimum, maximum, threshold)   # temporary: check that the input works
+
+    readings = generate_readings(count, minimum, maximum)
+    print(f"Generated {readings.size} {sensor_type} readings:")
+    print(readings)   # temporary: check the readings
 
 
 if __name__ == "__main__":
