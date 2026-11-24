@@ -65,13 +65,41 @@ def generate_readings(count, minimum, maximum, seed=SEED):
     readings = [round(random.uniform(minimum, maximum), 2) for _ in range(count)]
     return np.array(readings)
 
+def calculate_statistics(readings):
+    """Return a dictionary with the count, mean, minimum, maximum and standard deviation."""
+    return {
+        "count": readings.size,
+        "mean": np.mean(readings),
+        "minimum": np.min(readings),
+        "maximum": np.max(readings),
+        "std": np.std(readings),
+    }
+
+
+def find_outliers(readings, threshold):
+    """Return the readings that are above the alert threshold."""
+    return readings[readings > threshold]
+
+def print_report(sensor_type, statistics, outliers, threshold):
+    #"""Print the statistics and the readings above the threshold."""
+    print(f"\n--- {sensor_type} readings ---")
+    print(f"Number of readings: {statistics['count']}")
+    print(f"Mean:               {statistics['mean']:.2f}")
+    print(f"Minimum:            {statistics['minimum']:.2f}")
+    print(f"Maximum:            {statistics['maximum']:.2f}")
+    print(f"Standard deviation: {statistics['std']:.2f}")
+    print(f"Readings above {threshold}: {outliers.size}")
+    if outliers.size > 0:
+        print("Values above the threshold:", outliers)
+
 def main():
     print("Sensor Data Analysis Tool")
     sensor_type, count, minimum, maximum, threshold = get_user_input()
 
     readings = generate_readings(count, minimum, maximum)
-    print(f"Generated {readings.size} {sensor_type} readings:")
-    print(readings)   # temporary: check the readings
+    statistics = calculate_statistics(readings)
+    outliers = find_outliers(readings, threshold)
+    print_report(sensor_type, statistics, outliers, threshold)
 
 
 if __name__ == "__main__":
