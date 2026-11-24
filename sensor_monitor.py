@@ -5,6 +5,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def ask_text(prompt):
     #"""Keep asking until the user enters some text (not empty)."""
     while True:
@@ -28,6 +29,7 @@ def ask_positive_int(prompt):
             continue
         return value
 
+
 def ask_float(prompt):
     #"""Keep asking until the user enters a number."""
     while True:
@@ -36,6 +38,7 @@ def ask_float(prompt):
             return float(text)
         except ValueError:
             print(f"Invalid input: '{text}' is not a number.")
+
 
 def get_user_input():
     #"""Ask for all settings and return them as a tuple."""
@@ -52,8 +55,8 @@ def get_user_input():
     threshold = ask_float("Alert threshold: ")
     return sensor_type, count, minimum, maximum, threshold
 
-SEED = 42
 
+SEED = 42
 def generate_readings(count, minimum, maximum, seed=SEED):
     #"""Return a NumPy array of count random readings between minimum and maximum."""
     if count <= 0:
@@ -64,6 +67,7 @@ def generate_readings(count, minimum, maximum, seed=SEED):
     random.seed(seed)
     readings = [round(random.uniform(minimum, maximum), 2) for _ in range(count)]
     return np.array(readings)
+
 
 def calculate_statistics(readings):
     #"""Return a dictionary with the count, mean, minimum, maximum and standard deviation."""
@@ -80,6 +84,7 @@ def find_outliers(readings, threshold):
     #"""Return the readings that are above the alert threshold."""
     return readings[readings > threshold]
 
+
 def print_report(sensor_type, statistics, outliers, threshold):
     #"""Print the statistics and the readings above the threshold."""
     print(f"\n--- {sensor_type} readings ---")
@@ -92,8 +97,8 @@ def print_report(sensor_type, statistics, outliers, threshold):
     if outliers.size > 0:
         print("Values above the threshold:", outliers)
 
-CSV_FILE = "readings.csv"
 
+CSV_FILE = "readings.csv"
 def save_readings(filename, readings, sensor_type):
     #"""Save the readings to a CSV file: sample number, sensor type, reading."""
     with open(filename, "w", newline="", encoding="utf-8") as file:
@@ -115,6 +120,7 @@ def load_readings(filename):
         raise ValueError(f"{filename} contains no readings")
     return sensor_type, np.array(readings)
 
+
 def plot_readings(readings, threshold, sensor_type):
     #"""Line plot of the readings with the alert threshold. Saves it as line_plot.png."""
     sample_numbers = np.arange(1, readings.size + 1)
@@ -132,6 +138,7 @@ def plot_readings(readings, threshold, sensor_type):
     plt.tight_layout()
     plt.savefig("line_plot.png", dpi=150)
 
+
 def plot_histogram(readings, threshold, sensor_type):
     #"""Histogram of the readings with the alert threshold. Saves it as histogram.png."""
     plt.figure(figsize=(8, 4))
@@ -144,6 +151,7 @@ def plot_histogram(readings, threshold, sensor_type):
     plt.grid(axis="y")
     plt.tight_layout()
     plt.savefig("histogram.png", dpi=150)
+
 
 def ask_choice():
     """Ask whether to generate new readings or load them from a CSV file."""
@@ -164,6 +172,7 @@ def analyze_and_plot(sensor_type, readings, threshold):
     plot_readings(readings, threshold, sensor_type)
     plot_histogram(readings, threshold, sensor_type)
     plt.show()
+
 
 def main():
     print("Sensor Data Analysis Tool")
