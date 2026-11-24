@@ -115,6 +115,36 @@ def load_readings(filename):
         raise ValueError(f"{filename} contains no readings")
     return sensor_type, np.array(readings)
 
+def plot_readings(readings, threshold, sensor_type):
+    #"""Line plot of the readings with the alert threshold. Saves it as line_plot.png."""
+    sample_numbers = np.arange(1, readings.size + 1)
+    above = readings > threshold
+
+    plt.figure(figsize=(10, 4))
+    plt.plot(sample_numbers, readings, marker="o", markersize=3, label=f"{sensor_type} reading")
+    plt.plot(sample_numbers[above], readings[above], "o", color="red", label="Above threshold")
+    plt.axhline(threshold, color="red", linestyle="--", label=f"Alert threshold ({threshold})")
+    plt.title(f"{sensor_type.capitalize()} readings")
+    plt.xlabel("Sample number")
+    plt.ylabel(f"{sensor_type} value")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig("line_plot.png", dpi=150)
+
+def plot_histogram(readings, threshold, sensor_type):
+    #"""Histogram of the readings with the alert threshold. Saves it as histogram.png."""
+    plt.figure(figsize=(8, 4))
+    plt.hist(readings, bins=10, edgecolor="black", label=f"{sensor_type} readings")
+    plt.axvline(threshold, color="red", linestyle="--", label=f"Alert threshold ({threshold})")
+    plt.title(f"Distribution of {sensor_type} readings")
+    plt.xlabel(f"{sensor_type} value")
+    plt.ylabel("Number of readings")
+    plt.legend()
+    plt.grid(axis="y")
+    plt.tight_layout()
+    plt.savefig("histogram.png", dpi=150)
+
 def main():
     print("Sensor Data Analysis Tool")
     sensor_type, count, minimum, maximum, threshold = get_user_input()
@@ -129,8 +159,9 @@ def main():
     except OSError as error:
         print(f"Could not save {CSV_FILE}: {error}")
 
-    loaded_type, loaded = load_readings(CSV_FILE)        # temporary: check the file
-    print("Check:", loaded_type, loaded)
+    plot_readings(readings, threshold, sensor_type)
+    plot_histogram(readings, threshold, sensor_type)
+    plt.show()    # opens both graph windows; the program ends when you close them
     
 
 if __name__ == "__main__":
