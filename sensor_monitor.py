@@ -52,7 +52,7 @@ def get_user_input():
     threshold = ask_float("Alert threshold: ")
     return sensor_type, count, minimum, maximum, threshold
 
-SEED = 42   # fixed seed: the same "random" readings every run (reproducible)
+SEED = 42
 
 def generate_readings(count, minimum, maximum, seed=SEED):
     #"""Return a NumPy array of count random readings between minimum and maximum."""
@@ -145,24 +145,53 @@ def plot_histogram(readings, threshold, sensor_type):
     plt.tight_layout()
     plt.savefig("histogram.png", dpi=150)
 
-def main():
-    print("Sensor Data Analysis Tool")
-    sensor_type, count, minimum, maximum, threshold = get_user_input()
+def ask_choice():
+    """Ask whether to generate new readings or load them from a CSV file."""
+    print("1) Generate new sensor readings")
+    print("2) Load readings from a CSV file")
+    while True:
+        choice = input("Choose 1 or 2: ").strip()
+        if choice in ("1", "2"):
+            return choice
+        print("Invalid input: please type 1 or 2.")
 
-    readings = generate_readings(count, minimum, maximum)
+
+def analyze_and_plot(sensor_type, readings, threshold):
+    #"""Print the statistics and readings above the threshold, then show both graphs."""
     statistics = calculate_statistics(readings)
     outliers = find_outliers(readings, threshold)
     print_report(sensor_type, statistics, outliers, threshold)
-    try:
-        save_readings(CSV_FILE, readings, sensor_type)
-        print(f"Saved {readings.size} readings to {CSV_FILE}")
-    except OSError as error:
-        print(f"Could not save {CSV_FILE}: {error}")
-
     plot_readings(readings, threshold, sensor_type)
     plot_histogram(readings, threshold, sensor_type)
-    plt.show()    # opens both graph windows; the program ends when you close them
-    
+    plt.show()
 
+def main():
+    print("Sensor Data Analysis Tool")
+    choice = ask_choice()
+
+    if choice == "1":
+        sensor_type, count, minimum, maximum, threshold = get_user_input()
+        readings = generate_readings(count, minimum, maximum)
+        try:
+            save_readings(CSV_FILE, readings, sensor_type)
+            print(f"Saved {readings.size} readings to {CSV_FILE}")
+        except OSError as error:
+            print(f"Could not save {CSV_FILE}: {error}")
+    else:
+        filename = input(f"CSV file to load (press Enter for {CSV_FILE}): ").strip() or CSV_FILE
+        try:
+            sensor_type, readings = load_readings(filename)
+        except OSError as error:
+            print(f"Could not open {filename}: {error}")
+            return
+        except (ValueError, KeyError) as error:
+            print(f"{filename} is not a valid readings file: {error}")
+            return
+        print(f"Loaded {readings.size} {sensor_type} readings from {filename}")
+        threshold = ask_float("Alert threshold: ")
+
+    analyze_and_plot(sensor_type, readings, threshold)
+
+    
 if __name__ == "__main__":
     main()
