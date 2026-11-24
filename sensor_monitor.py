@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 def ask_text(prompt):
-    #"""Keep asking until the user enters some text (not empty)."""
+    """Keep asking until the user enters some text (not empty)."""
     while True:
         text = input(prompt).strip()
         if text:
@@ -16,7 +16,7 @@ def ask_text(prompt):
 
 
 def ask_positive_int(prompt):
-    #"""Keep asking until the user enters a whole number greater than 0."""
+    """Keep asking until the user enters a whole number greater than 0."""
     while True:
         text = input(prompt).strip()
         try:
@@ -31,7 +31,7 @@ def ask_positive_int(prompt):
 
 
 def ask_float(prompt):
-    #"""Keep asking until the user enters a number."""
+    """Keep asking until the user enters a number."""
     while True:
         text = input(prompt).strip()
         try:
@@ -41,7 +41,7 @@ def ask_float(prompt):
 
 
 def get_user_input():
-    #"""Ask for all settings and return them as a tuple."""
+    """Ask for all settings and return them as a tuple."""
     sensor_type = ask_text("Sensor type (e.g. temperature, light): ")
     count = ask_positive_int("Number of readings: ")
 
@@ -58,7 +58,7 @@ def get_user_input():
 
 SEED = 42
 def generate_readings(count, minimum, maximum, seed=SEED):
-    #"""Return a NumPy array of count random readings between minimum and maximum."""
+    """Return a NumPy array of count random readings between minimum and maximum."""
     if count <= 0:
         raise ValueError("count must be greater than 0")
     if minimum >= maximum:
@@ -70,7 +70,7 @@ def generate_readings(count, minimum, maximum, seed=SEED):
 
 
 def calculate_statistics(readings):
-    #"""Return a dictionary with the count, mean, minimum, maximum and standard deviation."""
+    """Return a dictionary with the count, mean, minimum, maximum and standard deviation."""
     return {
         "count": readings.size,
         "mean": np.mean(readings),
@@ -81,12 +81,12 @@ def calculate_statistics(readings):
 
 
 def find_outliers(readings, threshold):
-    #"""Return the readings that are above the alert threshold."""
+    """Return the readings that are above the alert threshold."""
     return readings[readings > threshold]
 
 
 def print_report(sensor_type, statistics, outliers, threshold):
-    #"""Print the statistics and the readings above the threshold."""
+    """Print the statistics and the readings above the threshold."""
     print(f"\n--- {sensor_type} readings ---")
     print(f"Number of readings: {statistics['count']}")
     print(f"Mean:               {statistics['mean']:.2f}")
@@ -100,7 +100,7 @@ def print_report(sensor_type, statistics, outliers, threshold):
 
 CSV_FILE = "readings.csv"
 def save_readings(filename, readings, sensor_type):
-    #"""Save the readings to a CSV file: sample number, sensor type, reading."""
+    """Save the readings to a CSV file: sample number, sensor type, reading."""
     with open(filename, "w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
         writer.writerow(["sample", "sensor_type", "reading"])
@@ -109,7 +109,7 @@ def save_readings(filename, readings, sensor_type):
 
 
 def load_readings(filename):
-    #"""Load readings from a CSV file. Return (sensor_type, NumPy array of readings)."""
+    """Load readings from a CSV file. Return (sensor_type, NumPy array of readings)."""
     readings = []
     sensor_type = "unknown"
     with open(filename, "r", newline="", encoding="utf-8") as file:
@@ -122,7 +122,7 @@ def load_readings(filename):
 
 
 def plot_readings(readings, threshold, sensor_type):
-    #"""Line plot of the readings with the alert threshold. Saves it as line_plot.png."""
+    """Line plot of the readings with the alert threshold. Saves it as line_plot.png."""
     sample_numbers = np.arange(1, readings.size + 1)
     above = readings > threshold
 
@@ -140,7 +140,7 @@ def plot_readings(readings, threshold, sensor_type):
 
 
 def plot_histogram(readings, threshold, sensor_type):
-    #"""Histogram of the readings with the alert threshold. Saves it as histogram.png."""
+    """Histogram of the readings with the alert threshold. Saves it as histogram.png."""
     plt.figure(figsize=(8, 4))
     plt.hist(readings, bins=10, edgecolor="black", label=f"{sensor_type} readings")
     plt.axvline(threshold, color="red", linestyle="--", label=f"Alert threshold ({threshold})")
@@ -165,7 +165,7 @@ def ask_choice():
 
 
 def analyze_and_plot(sensor_type, readings, threshold):
-    #"""Print the statistics and readings above the threshold, then show both graphs."""
+    """Print the statistics and readings above the threshold, then show both graphs."""
     statistics = calculate_statistics(readings)
     outliers = find_outliers(readings, threshold)
     print_report(sensor_type, statistics, outliers, threshold)
