@@ -66,7 +66,7 @@ def generate_readings(count, minimum, maximum, seed=SEED):
     return np.array(readings)
 
 def calculate_statistics(readings):
-    """Return a dictionary with the count, mean, minimum, maximum and standard deviation."""
+    #"""Return a dictionary with the count, mean, minimum, maximum and standard deviation."""
     return {
         "count": readings.size,
         "mean": np.mean(readings),
@@ -77,7 +77,7 @@ def calculate_statistics(readings):
 
 
 def find_outliers(readings, threshold):
-    """Return the readings that are above the alert threshold."""
+    #"""Return the readings that are above the alert threshold."""
     return readings[readings > threshold]
 
 def print_report(sensor_type, statistics, outliers, threshold):
@@ -92,6 +92,29 @@ def print_report(sensor_type, statistics, outliers, threshold):
     if outliers.size > 0:
         print("Values above the threshold:", outliers)
 
+CSV_FILE = "readings.csv"
+
+def save_readings(filename, readings, sensor_type):
+    #"""Save the readings to a CSV file: sample number, sensor type, reading."""
+    with open(filename, "w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["sample", "sensor_type", "reading"])
+        for sample_number, value in enumerate(readings, start=1):
+            writer.writerow([sample_number, sensor_type, value])
+
+
+def load_readings(filename):
+    #"""Load readings from a CSV file. Return (sensor_type, NumPy array of readings)."""
+    readings = []
+    sensor_type = "unknown"
+    with open(filename, "r", newline="", encoding="utf-8") as file:
+        for row in csv.DictReader(file):
+            readings.append(float(row["reading"]))
+            sensor_type = row.get("sensor_type", sensor_type)
+    if not readings:
+        raise ValueError(f"{filename} contains no readings")
+    return sensor_type, np.array(readings)
+
 def main():
     print("Sensor Data Analysis Tool")
     sensor_type, count, minimum, maximum, threshold = get_user_input()
@@ -100,7 +123,15 @@ def main():
     statistics = calculate_statistics(readings)
     outliers = find_outliers(readings, threshold)
     print_report(sensor_type, statistics, outliers, threshold)
+    try:
+        save_readings(CSV_FILE, readings, sensor_type)
+        print(f"Saved {readings.size} readings to {CSV_FILE}")
+    except OSError as error:
+        print(f"Could not save {CSV_FILE}: {error}")
 
+    loaded_type, loaded = load_readings(CSV_FILE)        # temporary: check the file
+    print("Check:", loaded_type, loaded)
+    
 
 if __name__ == "__main__":
     main()
